@@ -4,7 +4,8 @@
   "author": "none",
   "scripts": {},
   "dependencies": {
-    "node-hue-api": "*"
+    "node-hue-api": "*",
+    "log4js": "*"
   },
   "private": true
 }

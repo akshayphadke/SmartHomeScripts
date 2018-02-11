@@ -4,6 +4,8 @@ var hue = require("node-hue-api"),
     lightState = hue.lightState;
 
 var changeDefaultColor = require("./changeDefaultColor");
+var logger = require("./log.js")
+
 
 var hue = new HueApi();
 
@@ -14,11 +16,13 @@ var user;
   var bridgeConfig;
   fs.readFile('bridge-config.json', 'utf8', (err, data) => {
     if (err) {
+      logger.error("*******Bridge connecting error**********" + err);
       throw err;
     } else {
+      logger.info("Obtained Bridge config");
       bridgeConfig = JSON.parse(data);
       host = bridgeConfig.bridgeIp;
-      // console.log(bridgeIp);
+      // logger.info(bridgeIp);
       createUserIfNotExist();
     }
   });
@@ -32,9 +36,10 @@ function createUserIfNotExist() {
 
   fs.readFile('user.txt', 'utf8', (err, data) => {
     if (err) {
-      console.log(err);
+      logger.error(err);
       createUserAndCreateFile();
     } else {
+      logger.info("Obtained user info");
       user = JSON.parse(data);
       startOps();
     }
@@ -45,10 +50,10 @@ function createUserAndCreateFile() {
   const userDescription = "js code username";
   hue.registerUser(host, userDescription)
         .then((result) => {
-            console.log("Created user: " + JSON.stringify(result));
+            logger.error("Created user: " + JSON.stringify(result));
             fs.writeFile('user.txt', JSON.stringify(result), 'utf8', (err, data) => {
               if (err) {
-                console.log(err);
+                logger.error(err);
                 throw err;
               } else {
                 user = JSON.stringify(result);
@@ -57,7 +62,7 @@ function createUserAndCreateFile() {
             });
         })
         .fail((err) => {
-            console.log(err);
+            logger.error(err);
         })
         .done();
 }
@@ -65,6 +70,7 @@ function createUserAndCreateFile() {
 // ====================== Do whatever operations you need to do  ======================
 
 function startOps() {
+  logger.info("Starting registered operations");
   api = new HueApi(host, user);
   changeDefaultColor.start(api);
 }
